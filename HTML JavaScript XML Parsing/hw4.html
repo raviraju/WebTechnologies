@@ -1,0 +1,193 @@
+<!DOCTYPE HTML>
+<html lang="en">
+    <head>
+        <title>XML_Parser</title>
+        <style>
+        body {
+            margin: 0 auto;
+            width:70%;
+            text-align: center;
+        }
+        </style>
+    </head>
+    <body>
+        <form>
+            <h4>Enter the URL for Stations List XML file</h4>
+            <input type="text" id="id_urlText" width="1">
+            <br><br>
+            <input type="submit" id="id_queryButton" value="Submit Query" onclick="handleSubmit()">
+        </form>
+        <script type="text/javascript">
+            
+            function fillTextTableCell(row, tagName, tableRow){
+                var td = document.createElement("td");
+                //console.info("row.getElementsByTagName(",tagName, ")[0].childNodes.length : ", row.getElementsByTagName(tagName)[0].childNodes.length);
+                var firstChildNode = row.getElementsByTagName(tagName)[0].firstChild;
+                td.appendChild(document.createTextNode(firstChildNode? (firstChildNode.nodeValue) : "N.A.") );
+                console.log(td.innerHTML);
+                tableRow.appendChild(td);
+            }
+            
+            function parseXML(xmlData){
+                if(xmlData.getElementsByTagName("Header").length == 0)
+                {
+                    console.info()
+                    alert("Error in XML file");
+                    return;
+                }
+                
+                var html_begin = "<!DOCTYPE HTML><html> <head><title>XML_Parser_Output</title></head> <body>";
+                var html_end = "</body></html>";
+                    
+                var divcontainer = document.createElement("div");
+                
+                var table = document.createElement("table");
+                table.setAttribute("border","1");
+                
+                var tr = document.createElement("tr");
+                var headers = xmlData.getElementsByTagName("Header")[0].childNodes;
+                //console.log("No of header data : ", headers.length);
+                for(var i=0; i<headers.length; ++i )
+                {
+                    if(headers[i].nodeType == 1)//check if element node
+                    {
+                        var th = document.createElement("th");
+                        var th_text = document.createTextNode(headers[i].firstChild.nodeValue);
+                        th.appendChild(th_text);
+                        tr.appendChild(th);
+                        //tr.appendChild(document.createElement("th").appendChild( document.createTextNode(headers[i].firstChild.nodeValue) ) );
+                    }
+                    //console.log("headers[ ", i , "] : ", headers[i].firstChild.nodeValue, " nodeType = ", headers[i].nodeType);
+                }
+                table.appendChild(tr);
+                
+                var td, firstChildNode;
+                var rows = xmlData.getElementsByTagName("Row");
+                if(rows.length ==0)
+                {
+                    alert("No radio station rows");
+                    return;
+                }
+                for(var j=0; j<rows.length; ++j)
+                {
+                    var row = rows[j];
+                    var trTemp = document.createElement("tr");
+                    
+                    fillTextTableCell(row,"CallSign",trTemp);
+                    fillTextTableCell(row,"Frequency",trTemp);
+                    
+                    td = document.createElement("td");
+                    var locations = row.getElementsByTagName("Location")[0].childNodes;
+                    console.log("no of locations : ", locations.length);
+                    var ul = document.createElement("ul");
+                    var locCount = 0;
+                    for(var k=0; k<locations.length; ++k){
+                        if(locations[k].nodeType == 1)//check if element node
+                        {
+                            locCount++;
+                            var loc = (locations[k].firstChild) ? (locations[k].firstChild.nodeValue) : "N.A.";
+                            console.log(loc);
+                            var li = document.createElement("li");
+                            li.appendChild(document.createTextNode(loc));
+                            ul.appendChild(li);
+                        }
+                    }
+                    console.log("locCount : ",locCount)
+                    if(locCount>0)
+                    {
+                        td.appendChild(ul);
+                    }
+                    else
+                    {
+                        td.appendChild(document.createTextNode("N.A."));
+                    }
+                    trTemp.appendChild(td);
+
+                    fillTextTableCell(row,"Format",trTemp);
+                    
+                    td = document.createElement("td");
+                    firstChildNode = row.getElementsByTagName("HomePage")[0].firstChild;
+                    if(firstChildNode)
+                    {
+                        var anchor = document.createElement("a");
+                        var link = firstChildNode.nodeValue;
+                        anchor.setAttribute("href",link );
+                        anchor.setAttribute("target","_blank");
+                        anchor.appendChild(document.createTextNode(link));
+                        td.appendChild(anchor);
+                        console.log(anchor);
+                    }
+                    else
+                    {
+                        td.appendChild( document.createTextNode("N.A.") );
+                    }                    
+                    trTemp.appendChild(td);
+                    
+                    td = document.createElement("td");
+                    firstChildNode = row.getElementsByTagName("Logo")[0].firstChild;
+                    if(firstChildNode)
+                    {
+                        var image = document.createElement("img");
+                        image.setAttribute("src", firstChildNode.nodeValue);
+                        image.setAttribute("width", "100%");
+                        image.setAttribute("height", "100%");
+                        td.appendChild(image);
+                        console.log(image);
+                    }
+                    else
+                    {
+                        td.appendChild( document.createTextNode("N.A.") );
+                    }
+                    trTemp.appendChild(td);
+                    
+                    table.appendChild(trTemp);
+                }
+                
+                divcontainer.appendChild(table);
+                        
+                var complete_html = html_begin + divcontainer.innerHTML + html_end;
+                var resultWindow = window.open('','name','height=500,width=1000,scrollbars=1');
+                resultWindow.document.write(complete_html);
+                resultWindow.document.close();  //to avoid continous load
+            }
+            
+            function loadXML(url){
+                var xmlHttp;
+                if(window.XMLHttpRequest){
+                    xmlHttp = new XMLHttpRequest();
+                }else { //IE5,IE6 support
+                    xmlHttp = new ActiveXObject("Microsoft.XMLHTTP");
+                }
+
+                xmlHttp.onreadystatechange = function(){
+                    if ((xmlHttp.readyState == 4) && (xmlHttp.status == 200)) {
+                        parseXML(xmlHttp.responseXML);
+                    }
+                    if ((xmlHttp.readyState == 4) && (xmlHttp.status == 404)) {
+                        alert("XML File Not Found");
+                        return;
+                    }
+                };
+                
+                xmlHttp.open("GET",url,false);
+                xmlHttp.send();
+                
+            }
+            
+            function handleSubmit(){
+                var url_text = document.getElementById("id_urlText").value;
+                if(url_text.length == 0){
+                    alert("Enter URL for XML file!!!");
+                    return;
+                }
+                //console.log("url : ", url_text);
+                loadXML(url_text);
+            }
+            
+            /*window.onload = function(){
+                 document.getElementById("id_queryButton").addEventListener("click",handleSubmit);   
+            };*/
+        </script>
+    <NOSCRIPT>
+    </body>
+</html>
