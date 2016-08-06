@@ -1,0 +1,160 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name = "viewport" content = "width=device-width, initial-scale=1.0, user-scalable=no">
+    <script src="http://code.jquery.com/jquery-1.10.2.js"></script>
+    <script src="http://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
+    <script src="http://code.highcharts.com/stock/highstock.js"></script>
+    <script type="text/javascript">
+
+	function mapDate(dateIn) {
+        var dat = new Date(dateIn);
+        return Date.UTC(dat.getFullYear(), dat.getMonth(), dat.getDate());
+	};
+    function getOHLC(json) {
+        var dates = json.Dates || [];
+        var elements = json.Elements || [];
+        var chartSeries = [];
+
+        if (elements[0]){
+
+            for (var i = 0, datLen = dates.length; i < datLen; i++) {
+                var dat = mapDate( dates[i] );
+                var pointData = [
+                    dat,
+                    elements[0].DataSeries['open'].values[i],
+                    elements[0].DataSeries['high'].values[i],
+                    elements[0].DataSeries['low'].values[i],
+                    elements[0].DataSeries['close'].values[i]
+                ];
+                chartSeries.push( pointData );
+            };
+        }
+        return chartSeries;
+    };
+
+    function parseStockHistory(symbol, stock_history){
+        var ohlc = getOHLC(stock_history);
+        // create the chart
+        $('#chartContainer').highcharts('StockChart', {
+
+            rangeSelector: {
+                allButtonsEnabled: true,
+                buttons: [{
+                            type: 'week',
+                            count: 1,
+                            text: '1w'
+                        }, {
+                            type: 'month',
+                            count: 1,
+                            text: '1m'
+                        }, {
+                            type: 'month',
+                            count: 3,
+                            text: '3m'
+                        }, {
+                            type: 'month',
+                            count: 6,
+                            text: '6m'
+                        }, {
+                            type: 'ytd',
+                            text: 'YTD'
+                        }, {
+                            type: 'year',
+                            count: 1,
+                            text: '1y'
+                        }, {
+                            type: 'all',
+                            text: 'All'
+                        }],
+                selected: 0,					//to select week range by default
+                inputEnabled: false				//to disable data entry/display
+            },
+
+            title: {
+                text: symbol + ' Stock Value'
+            },
+
+            xAxis: [{
+                title: {
+                    text: 'Date Time'
+                },
+                height: 200,
+                lineWidth: 2
+            }],
+
+            yAxis: [{
+                title: {
+                    text: 'Stock Value'
+                },
+                height: 200,
+                lineWidth: 2
+            }],
+
+            series: [{
+                type: 'area',
+                name: symbol,
+                data: ohlc,
+                threshold : null,
+                tooltip : {
+                    valuePrefix : "$",
+                    valueDecimals : 2
+                },
+                fillColor : {
+                    linearGradient : {
+                        x1: 0,
+                        y1: 0,
+                        x2: 0,
+                        y2: 1
+                    },
+                    stops : [
+                        [0, Highcharts.getOptions().colors[0]],
+                        [1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
+                    ]
+                }
+            }]
+        });
+    }
+    function loadChartData() {
+        var jsonData = window.webConnector.load();
+        parseStockHistory("AAPL", jsonData);
+        //console.log(jsonData);
+        //toaster.showToast(jsonData);
+    }
+
+    function getInteractiveChartData(user_symbol){
+        $.ajax({
+                beforeSend:function(){
+                    //$("#chartDemoContainer").text("Loading chart...");
+                },
+                url: "http://ravirajustocksearch.us-west-2.elasticbeanstalk.com/server.php",
+                type: "GET",
+                async: false,
+                dataType: "json",
+                data: {
+                    symbol: user_symbol,
+                    search: "get_chartData"
+                    },
+                success: function(stock_history) {
+                            parseStockHistory(user_symbol, stock_history);
+                            return;
+                        },
+                error: function(response,txtStatus){
+                            console.log(response,txtStatus);
+                            return;
+                        }
+            });
+    }
+    function loadChartData2() {
+        var symbol = window.webConnector.getSymbol();
+        getInteractiveChartData(symbol);
+    }
+    </script>
+</head>
+<body onload="loadChartData2()">
+<div id="chartContainer"></div>
+</body>
+</html>

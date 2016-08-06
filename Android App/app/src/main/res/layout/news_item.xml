@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:drawable="@color/abc_background_cache_hint_selector_material_light"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/titleLinkText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Title_Link"
+        android:textColor="@color/colorPrimaryDark"
+        android:textSize="25sp"
+        android:textStyle="bold"
+        android:paddingTop="3dp" />
+
+    <TextView
+        android:id="@+id/descText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Description"
+        android:textColor="@color/colorLightDark"
+        android:textSize="20sp"
+        android:paddingTop="3dp" />
+
+    <TextView
+        android:id="@+id/publisherText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Publisher"
+        android:textColor="@color/colorLightDark"
+        android:textSize="18sp"
+        android:paddingTop="2dp" />
+
+    <TextView
+        android:id="@+id/dateText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Date"
+        android:textColor="@color/colorLightDark"
+        android:textSize="18sp" />
+
+</LinearLayout>

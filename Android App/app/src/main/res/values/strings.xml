@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Stock Market Viewer</string>
+    <string name="stockName_prompt">Stock Name/Symbol</string>
+    <string name="get_quote">GET QUOTE</string>
+    <string name="clear">CLEAR</string>
+    <string name="favText">Favorites</string>
+    <string name="action_favorite">fav_action</string>
+    <string name="action_fb">facebook</string>
+    <string name="facebook_app_id">209064282819293</string>
+</resources>

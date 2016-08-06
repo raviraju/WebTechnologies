@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="stockName_prompt">Stock Name/Symbol</string>
+    <string name="get_quote">GET QUOTE</string>
+    <string name="clear">CLEAR</string>
+    <string name="favText">Favorites</string>
+</resources>

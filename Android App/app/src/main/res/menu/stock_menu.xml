@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+        <!-- "Mark Favorite", should appear as action button if possible -->
+    <!--android:icon="@drawable/btn_star"-->
+        <!--<item
+            android:id="@+id/action_favorite"
+            android:title="@string/action_favorite"
+            android:checkable="true"
+            app:actionLayout="@layout/action_layout_styled_checkbox"
+            app:actionViewClass="android.widget.CheckBox"
+            app:showAsAction="always"/>-->
+        <item
+            android:id="@+id/action_favorite"
+            android:title="@string/action_favorite"
+            android:icon="@drawable/btn_star"
+            android:checkable="true"
+            app:showAsAction="always"/>
+        <item
+            android:id="@+id/action_fb"
+            android:icon="@drawable/facebook"
+            android:title="@string/action_fb"
+            app:showAsAction="always"/>
+
+
+
+</menu>
