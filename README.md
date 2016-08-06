@@ -18,3 +18,10 @@ To create a webpage that allows you to search for stock information using the Ma
  Get hands-on experience in Google Cloud App Engine and Amazon Web Services
  Get hands-on experience on how to use Bootstrap to enhance the user experience
  Provide an interface to perform stock search using MarkitonDemand and post details to Facebook.
+
+# Android App : Stock Search Android App with Facebook Post
+Ø Become familiar with Android Studio, Android App development and Facebook SDK for
+Android.
+Ø Build a good-looking Android app using the Android SDK.
+Ø Add social networking features using the Facebook SDK.
+
