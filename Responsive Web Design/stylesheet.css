@@ -1,0 +1,36 @@
+#msg{
+	color:red;
+}
+
+body{
+	background-color:#1B5173;
+}
+
+@media only screen and (max-width: 600px) {
+    /* For mobile phones: */
+	#hide{
+		display:none;
+	}
+}
+
+@media (min-width: 992px){
+	.form-control-inline {
+		display: inline-block;
+		width:380px;
+		vertical-align: middle;
+	}
+}
+
+@media (max-width: 991px){
+	.form-control-inline {
+		display: inline-block;
+		width:100%;
+		vertical-align: middle;
+	}
+}
+
+.tab-content > .tab-pane:not(.active) {
+    display: block;
+    height: 0;
+    overflow-y: hidden;
+}

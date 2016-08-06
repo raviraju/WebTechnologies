@@ -1,0 +1,201 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<!--To ensure proper rendering and touch zooming-->
+	<meta name="viewport" content="width=device-width">
+	<!--disable zooming capabilities on mobile devices by
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">-->
+	<title>Stock Search</title>
+	
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+	<link rel="stylesheet" href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css">
+	<link rel="stylesheet" href="http://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+	<link rel="stylesheet" href="stylesheet.css" />
+	
+	
+	<script src="http://code.jquery.com/jquery-1.10.2.js"></script>
+	<script src="http://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+	<script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
+	<script src="http://code.highcharts.com/stock/highstock.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.12.0/moment.min.js"></script>
+	<script src="http://connect.facebook.net/en_US/all.js"></script>
+	<script src="script.js"></script>
+</head>
+<body>
+	<!--FaceBook SDK--old : 450581335145244 -->
+	<script>
+		window.fbAsyncInit = function() {
+			FB.init({
+			appId      : '1693099624297130',
+			status	   : true,
+			cookie     : true,
+			xfbml      : true,
+			version    : 'v2.5'
+			});
+		};
+		
+		/*FB.getLoginStatus(function(response) {
+			console.log(response);
+			if (response.status === 'connected') {
+				// the user is logged in and has authenticated your
+				// app, and response.authResponse supplies
+				// the user's ID, a valid access token, a signed
+				// request, and the time the access token 
+				// and signed request each expire				
+				var uid = response.authResponse.userID;
+				var accessToken = response.authResponse.accessToken;
+			} else if (response.status === 'not_authorized') {
+				// the user is logged in to Facebook, 
+				// but has not authenticated your app
+			} else {
+				// the user isn't logged in to Facebook.
+			}
+		});*/
+	</script>
+	<!--<div
+		class="fb-like"
+		data-share="true"
+		data-width="450"
+		data-show-faces="true">
+	</div>-->
+
+	<div class="container">
+		<div class="well well-md" style="background-color:white; margin-top: 20px;">
+			<form id="srcForm" class="form-inline" action="server.php" method="get">
+				<div class="text-center">
+					<h3>Stock Market Search</h3>
+				</div>
+				<div class="row">
+					<label for="symbol" class="col-sm-5 col-md-4 col-lg-4">
+						Enter the stock name or symbol:<span style="color:red;">*</span>
+					</label>
+					<section class="col-xs-12 col-sm-3 col-sm-pull-1 col-md-5 col-md-pull-1 col-lg-4 col-lg-pull-0">
+						<input class="form-control-inline input-sm" type="search" name="symbol" id="symbol" value="" placeholder="Apple Inc or AAPL" required /><br>
+						<!--<input class="form-control input-sm hidden-sm hidden-md hidden-lg" type="search" name="symbol" id="symbol" value="" placeholder="Apple Inc or AAPL" required /><br>-->
+					</section>
+					<div class="col-xs-12 hidden-sm hidden-md hidden-lg hidden-xl"><br></div>
+					<section class="col-sm-4 col-sm-pull-1 col-md-3 col-md-pull-1 col-lg-3 col-lg-push-1">
+						<button type="submit" class="btn btn-primary btn-sm">
+							<span class="glyphicon glyphicon-search" aria-hidden="true"></span> Get Quote
+						</button>
+						
+						<button type="reset" class="btn btn-default btn-sm">
+							<span class="glyphicon glyphicon-refresh" aria-hidden="true"></span> Clear
+						</button>
+					</section>
+					<br>
+					<div class="col-sm-offset-5 col-sm-3 col-sm-pull-1 col-md-3 col-md-pull-2 col-lg-pull-1">
+						<p id="msg"></p>
+					</div>
+					<div class="col-sm-4 col-sm-pull-1 col-md-3 col-md-pull-0 col-lg-push-1">
+						Powered By:<a href="http://www.markit.com/product/markit-on-demand" target="blank" ><img src="http://cs-server.usc.edu:45678/hw/hw8/images/mod-logo.png" height="15px"></a>
+					</div>
+				</div>
+			</form>
+		</div>
+	
+		<hr>
+
+		<div class="carousel slide" id="featured" data-pause="false"><!--For automatic slide : data-ride="carousel"-->
+			<div class="carousel-inner">
+				<div id="fav" class="item active">				
+					<div class="well well-md" style="background-color:white;">
+						<div class="panel panel-default">
+							<div class="panel-heading">
+								<div class="row">
+									<section class="col-xs-3 panel-title">Favorite<span class="hidden-xs"> List</section>
+									<section class="col-xs-9 text-right">
+										<span class="hidden-xs">Automatic Refresh:</span>
+										<!--<button id="toggleBtn" type="button">toggle</button>-->
+										<input id="toggle-trigger" type="checkbox" data-toggle="toggle" title="Automatic Refresh Favorite Stocks">
+										<!--<button id="refreshBtn" type="button">refresh</button>-->
+										<button id="refreshBtn" type="button" class="btn btn-default" aria-label="Refresh" title="Refresh Favorite Stocks">
+											<span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
+										</button>
+										<!--<button id="goBtn" class="btn btn-default" disabled="disabled">></button>-->
+										<button id="goBtn" type="button" class="btn btn-default" aria-label="Go" title="Display Stock Information">
+											<span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span>
+										</button>
+									</section>
+									<div class="clearfix visible-xs-block"></div>
+								</div>
+							</div>
+							<div class="panel-body">
+								<div id="favStocks" class="table-responsive">
+									<table class="table table-striped" id="favTable_id">
+										<thead>
+											<tr> <th>Symbol</th> <th>Company Name</th> <th>Stock Price</th> <th>Change (Change Percent)</th> <th>Market Cap</th> </tr>
+										</thead>
+									</table>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div id="stock" class="item">
+					<div class="well well-md" style="background-color:white;">
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<div class="row">
+								<section class="col-xs-2">
+									<button id="backBtn" type="button" class="btn btn-default" aria-label="Back">
+										<span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span>
+									</button>
+								</section>
+								<section class="col-xs-10 h4 panel-title text-center">Stock Details</section>
+							</div>
+						</div>
+						<div class="panel-body">
+							<!-- Nav tabs -->
+							<ul class="nav nav-pills" role="tablist">
+								<li role="presentation" class="active"><a href="#currentStock" aria-controls="currentStock" role="tab" data-toggle="tab"><span class="glyphicon glyphicon-dashboard"></span><span class="hidden-xs"> Current</span> Stock</a></li>
+								<li role="presentation"><a href="#hist_chart" aria-controls="hist_chart" role="tab" data-toggle="tab"><span class="glyphicon glyphicon-stats"></span><span class="hidden-xs"> Historical</span> Charts</a></li>
+								<li role="presentation"><a href="#news_feeds" aria-controls="news_feeds" role="tab" data-toggle="tab"><span class="glyphicon glyphicon-link"></span> News<span class="hidden-xs"> Feeds</span></a></li>
+							</ul>
+							</br>
+							</br>
+							<!-- Tab panes -->
+							<div class="tab-content">
+								<div id="currentStock" role="tabpanel" class="tab-pane active">
+									<div class="row">
+										<section class="col-xs-6"><strong>Stock Details</strong></section>
+										<section class="col-xs-6 text-right">
+											<img id="fbBtn" src="fb_icon.png" height="34px" width="40px"/>
+											<button id="favBtn" type="button" class="btn btn-default active" aria-label="Favorite" title="Favorite Stock Selection">
+												<span id="favBtnColor" class="glyphicon glyphicon-star" style="color:white" aria-hidden="true"></span>
+											</button>
+										</section>
+									</div>
+									<div class="row">
+										<section class="col-md-6">
+											<div id="stockTable" class="table-responsive"></div>
+										</section>
+										<section class="col-md-6">
+											<div id="stockChart"></div>
+										</section>
+									</div>								
+								</div>
+								<div id="hist_chart" role="tabpanel" class="tab-pane">
+									<div class="row">
+										<section class="col-md-12">
+											<div id="chartContainer"></div>
+										</section>
+									</div>
+								</div>
+								<div id="news_feeds" role="tabpanel" class="tab-pane">
+									<div id="newsContainer"></div>
+								</div>
+							</div>
+						</div>
+					</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>
